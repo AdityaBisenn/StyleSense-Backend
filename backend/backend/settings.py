@@ -26,8 +26,10 @@ SECRET_KEY = 'django-insecure-yg!&3q$$01-%=l)&0zdu%=5nf%4ay_(nzp!m-+h6u9q3c%1fa(
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["*"]
-CORS_ALLOWED_ORIGINS = ["*"]
+CORS_ALLOWED_ORIGINS = [
+    'https://stylesense-backend-production.up.railway.app',
+    # Add other allowed origins if needed
+]
 
 
 import os

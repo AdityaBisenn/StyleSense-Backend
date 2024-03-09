@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-yg!&3q$$01-%=l)&0zdu%=5nf%4ay_(nzp!m-+h6u9q3c%1fa(
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_COOKIE_DOMAIN = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://stylesense-backend-production.up.railway.app/','https://*.127.0.0.1']
 
 import os
 from dotenv import load_dotenv

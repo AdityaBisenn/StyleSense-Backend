@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-yg!&3q$$01-%=l)&0zdu%=5nf%4ay_(nzp!m-+h6u9q3c%1fa(
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ['https://stylesense-backend-production.up.railway.app/','https://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ["*"]
+CORS_ALLOWED_ORIGINS = ["*"]
+
 
 import os
 from dotenv import load_dotenv
@@ -64,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'

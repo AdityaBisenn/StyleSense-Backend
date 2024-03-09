@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-yg!&3q$$01-%=l)&0zdu%=5nf%4ay_(nzp!m-+h6u9q3c%1fa(
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+CSRF_COOKIE_DOMAIN = ["*"]
 
 import os
 from dotenv import load_dotenv

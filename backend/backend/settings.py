@@ -26,8 +26,6 @@ SECRET_KEY = 'django-insecure-yg!&3q$$01-%=l)&0zdu%=5nf%4ay_(nzp!m-+h6u9q3c%1fa(
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["*"]
-CORS_ALLOWED_ORIGINS = ["*"]
 
 
 import os
@@ -55,6 +53,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
+    'product',
 ]
 
 MIDDLEWARE = [

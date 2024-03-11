@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db import connection
+import os
 
 import time
 
@@ -35,12 +36,12 @@ class Test(APIView):
 
     def post(self, request):
         chrome_options = Options()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--headless") 
         chrome_options.add_argument("--disable-dev-shm-usage")
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         url = request.data.get('url')
         driver.get(url)
         # print(driver.page_source)

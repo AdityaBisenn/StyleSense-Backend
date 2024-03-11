@@ -11,7 +11,8 @@ class Products(APIView):
         try:
             products = FashionProduct.objects.all()
             product_serializer = FashionProductSerializer(products, many=True)
-            return Response(product_serializer.data, status=status.HTTP_200_OK)
+            count = products.count()
+            return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -36,6 +37,7 @@ class AddProduct(APIView):
                         'url': row['Product Link'],
                         'images': row['Image Link'],
                         'colour': row['Color'],
+                        'brand': "H&M",
                     }
                     
                     fashion_product_serializer = FashionProductSerializer(data=fashion_product_data)

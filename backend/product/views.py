@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import FashionProduct
 from .serializers import FashionProductSerializer
+from authentication.models import CustomUser, Customer
 
 class Products(APIView):
     def get(self, request):
@@ -20,7 +21,7 @@ class AddProduct(APIView):
     def post(self, request, *args, **kwargs):
         try:
             # Specify the file path here
-            file_path = '/Users/adityabisen/Desktop/StyleSense AI/StyleSense-Backend/backend/product/product_info.csv'
+            file_path = '/Users/adityabisen/Desktop/StyleSense AI/newBackend/StyleSense-Backend/backend/product/product_info.csv'
 
             with open(file_path, 'r', encoding='utf-8') as csv_file:
                 decoded_file = csv.DictReader(csv_file)
@@ -50,3 +51,56 @@ class AddProduct(APIView):
         
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class SwipePageData(APIView):
+    def get(self, request):
+        try:
+            products = FashionProduct.objects.all()
+            product_serializer = FashionProductSerializer(products, many=True)
+            count = products.count()
+            return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class ProductDetails(APIView):
+    def get(self, request):
+        try:
+            product_id = request.query_params.get('id')
+            product = FashionProduct.objects.get(id=product_id)
+            product_serializer = FashionProductSerializer(product)
+            return Response(product_serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class SaveProduct(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            custom_user = CustomUser.objects.get(username=user)
+            product_id = request.query_params.get('id')
+            customer = Customer.objects.get(user=custom_user)
+            print(customer)
+            product = FashionProduct.objects.get(id=product_id)
+            print(product)
+            
+            customer.saved_products.add(product)
+            customer.save()
+
+            return Response({'message': 'Product saved successfully'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class SavedProducts(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            custom_user = CustomUser.objects.get(username=user)
+            customer = Customer.objects.get(user=custom_user)
+            saved_products = customer.saved_products.all()
+            product_serializer = FashionProductSerializer(saved_products, many=True)
+            count = saved_products.count()
+            return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+

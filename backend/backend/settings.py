@@ -52,8 +52,11 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
 
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
+
     'product',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +150,11 @@ STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'authentication.CustomUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}

@@ -104,3 +104,18 @@ class SavedProducts(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class RemoveSavedProduct(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            custom_user = CustomUser.objects.get(username=user)
+            customer = Customer.objects.get(user=custom_user)
+            product_id = request.query_params.get('id')
+            product = FashionProduct.objects.get(id=product_id)
+            customer.saved_products.remove(product)
+            customer.save()
+            return Response({'message': 'Product removed successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+

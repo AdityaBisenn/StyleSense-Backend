@@ -158,3 +158,5 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
+
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID')

@@ -54,54 +54,46 @@ class GoogleTokenExchangeAPIView(APIView):
     def post(self, request):
         # Extract the Google access token from the request data
         token = request.data.get('token')
-        print(token)
 
+        # Verify Google access token
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
-        userid = idinfo['sub']
-        print(userid)
+        userEmail = idinfo['email']
+
+        if userEmail:
+            # Try to retrieve the user based on email
+            user, created = CustomUser.objects.get_or_create(email=userEmail)
+            
+            if created:
+                user.is_customer = True
+                user.save()
+
+            # Authenticate the user using the custom authentication backend
+            user = authenticate(request, email=userEmail)
+
+            if user:
+                # If user is authenticated, log them in
+                login(request, user)
+
+                # Generate JWT tokens
+                refresh = RefreshToken.for_user(user)
+                access_token = AccessToken.for_user(user)
+
+                # Serialize user data
+                serialized_user = UserSerializer(user).data
+                print(serialized_user)
+
+                return Response({
+                    'user': serialized_user,
+                    'refresh': str(refresh),
+                    'access': str(access_token),
+                    'message': 'User authenticated successfully'
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Failed to authenticate user'}, status=status.HTTP_401_UNAUTHORIZED)
 
         return JsonResponse({'message': 'Token verified successfully'}, status=status.HTTP_200_OK)
         
-        # Make a request to Google's token verification endpoint to verify the token
-        # google_response = requests.get(
-        #     'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}'
-        # )
-        # google_data = google_response.json()
-        # print(google_response.text)
-
-        # if google_response.status_code == 200 and google_data.get('aud') == settings.GOOGLE_CLIENT_ID:
-        #     # Google token is valid, proceed with user login or signup
-        #     email = google_data.get('email')
-        #     if email:
-        #         # Check if user exists with this email
-        #         user = CustomUser.objects.filter(email=email).first()
-        #         if user is None:
-        #             # User doesn't exist, create a new user
-        #             user = CustomUser.objects.create_user(email=email)
-                
-        #         # Authenticate and login the user
-        #         user = authenticate(request, email=email)
-        #         if user:
-        #             login(request, user)
-        #             refresh = RefreshToken.for_user(user)
-        #             access_token = AccessToken.for_user(user)
-        #             serialized_user = UserSerializer(user).data
-        #             return Response({
-        #                 'user': serialized_user,
-        #                 'refresh': str(refresh),
-        #                 'access': str(access_token),
-        #                 'message': 'User authenticated successfully'
-        #             }, status=status.HTTP_200_OK)
-        #         else:
-        #             return Response({'error': 'Failed to authenticate user'}, status=status.HTTP_401_UNAUTHORIZED)
-        #     else:
-        #         return Response({'error': 'No email provided in Google response'}, status=status.HTTP_400_BAD_REQUEST)
-        # else:
-        #     # Google token is invalid or doesn't match your client ID
-        #     return Response({'error': 'Invalid Google access token'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+        
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def protected_route(request):

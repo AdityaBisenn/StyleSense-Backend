@@ -126,3 +126,15 @@ class RemoveSavedProduct(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class MostPopular(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            # get first 20 products
+            products = FashionProduct.objects.all()[:20]
+            product_serializer = FashionProductSerializer(products, many=True)
+            count = products.count()
+            return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

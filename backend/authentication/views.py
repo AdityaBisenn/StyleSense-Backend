@@ -13,13 +13,13 @@ from django.http import JsonResponse
 import requests
 from django.db import connection
 import os
-from authentication.models import CustomUser
+from authentication.models import CustomUser, Customer, Business
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
 class SignUpView(generics.CreateAPIView):
     serializer_class = UserSerializer
-    
+
     
 
 class LoginView(APIView):
@@ -60,12 +60,14 @@ class GoogleTokenExchangeAPIView(APIView):
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_CLIENT_ID)
         userEmail = idinfo['email']
 
+
         if userEmail:
             # Try to retrieve the user based on email
-            user, created = CustomUser.objects.get_or_create(email=userEmail)
+            user, created = CustomUser.objects.get_or_create(email=userEmail, username = userEmail)
             
             if created:
                 user.is_customer = True
+                Customer.objects.create(user=user)
                 user.save()
 
             # Authenticate the user using the custom authentication backend

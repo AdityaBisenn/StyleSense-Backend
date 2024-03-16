@@ -20,6 +20,7 @@ from google.auth.transport import requests
 class SignUpView(generics.CreateAPIView):
     serializer_class = UserSerializer
     
+    
 
 class LoginView(APIView):
     def post(self, request):

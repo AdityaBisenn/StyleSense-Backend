@@ -6,8 +6,10 @@ from rest_framework import status
 from .models import FashionProduct
 from .serializers import FashionProductSerializer
 from authentication.models import CustomUser, Customer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class Products(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
             products = FashionProduct.objects.all()
@@ -18,6 +20,8 @@ class Products(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class AddProduct(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         try:
             # Specify the file path here
@@ -53,9 +57,12 @@ class AddProduct(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class SwipePageData(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         try:
-            products = FashionProduct.objects.all()
+            # get first 20 products
+            products = FashionProduct.objects.all()[:20]
             product_serializer = FashionProductSerializer(products, many=True)
             count = products.count()
             return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)

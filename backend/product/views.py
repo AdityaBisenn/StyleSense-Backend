@@ -7,6 +7,8 @@ from .models import FashionProduct
 from .serializers import FashionProductSerializer
 from authentication.models import CustomUser, Customer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import json
+from decimal import Decimal
 
 class Products(APIView):
     permission_classes = [IsAuthenticated]
@@ -24,25 +26,36 @@ class AddProduct(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            # Specify the file path here
-            file_path = '/Users/adityabisen/Desktop/StyleSense AI/newBackend/StyleSense-Backend/backend/product/product_info.csv'
+            # Specify the file path to the modified JSON file
+            file_path = '/Users/adityabisen/Desktop/StyleSense AI/newBackend/StyleSense-Backend/backend/product/modified_product_details.json'
 
-            with open(file_path, 'r', encoding='utf-8') as csv_file:
-                decoded_file = csv.DictReader(csv_file)
+            # Load the modified JSON data
+            with open(file_path, 'r') as file:
+                modified_product_data = json.load(file)
                 
-                for row in decoded_file:
-                    # Extract numerical value from price string (e.g., "Rs.1,499.00")
-                    price_str = row['Price'].replace('Rs.', '').replace(',', '')
-                    # Convert price to float
-                    price = float(price_str)
+                for product_data in modified_product_data:
+                    price_info = product_data['product_info']['Price (MRP):']
+                    price_str = price_info.split('Rs. ')[1].split(' incl.')[0].replace(',', '')
+                    price = Decimal(price_str)
+                    rating = product_data['ratings']
+                    if rating:
+                        rating = float(rating)
+                    num_reviews = product_data['number_of_reviews']
+                    if num_reviews:
+                        num_reviews = int(num_reviews)
                     
                     fashion_product_data = {
-                        'name': row['Product Name'],
+                        'name': product_data['product_name'],
                         'price': price,
-                        'url': row['Product Link'],
-                        'images': row['Image Link'],
-                        'colour': row['Color'],
-                        'brand': "H&M",
+                        'url': product_data['url'],
+                        'images': product_data['image_urls'],  # Assuming 'image_urls' contains a list of image URLs
+                        'description': product_data['product_description'],
+                        'brand': 'H&M',
+                        'colour': product_data['color'],
+                        'rating': rating,
+                        'num_reviews': num_reviews,
+                        'gender': product_data['gender'],
+                        'category_details': product_data['category_details'],
                     }
                     
                     fashion_product_serializer = FashionProductSerializer(data=fashion_product_data)

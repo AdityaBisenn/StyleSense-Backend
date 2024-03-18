@@ -75,7 +75,7 @@ class SwipePageData(APIView):
     def get(self, request):
         try:
             # get first 20 products
-            products = FashionProduct.objects.all()[:20]
+            products = FashionProduct.objects.all()[:100]
             product_serializer = FashionProductSerializer(products, many=True)
             count = products.count()
             return Response({'count': count, 'products': product_serializer.data}, status=status.HTTP_200_OK)
